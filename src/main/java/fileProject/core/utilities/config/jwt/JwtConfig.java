@@ -47,10 +47,10 @@ public class JwtConfig {
 	}
 
 	public static void main(String[] args) {
-		keyUret();
+		createKey();
 	}
 
-	public static void keyUret() {
+	public static void createKey() {
 		SecretKey key = Jwts.SIG.HS512.key().build();
 		String str = Encoders.BASE64.encode(key.getEncoded());
 		System.out.println(str);

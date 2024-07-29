@@ -24,11 +24,14 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id")
 	private UUID id;
-	@Column(name = "name", nullable = false)
+
+	@Column(name = "name")
 	private String name;
-	@Column(name = "email", unique = true, nullable = false)
+
+	@Column(name = "email")
 	private String email;
-	@Column(name = "password", nullable = false)
+
+	@Column(name = "password")
 	private String password;
 
 }

@@ -27,11 +27,11 @@ public class FileShare {
 	private UUID id;
 
 	@ManyToOne
-	@JoinColumn(name = "file_id", nullable = false)
+	@JoinColumn(name = "file_id")
 	private File file;
 
 	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "user_id")
 	private User user;
 
 }

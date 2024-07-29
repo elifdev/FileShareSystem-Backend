@@ -1,12 +1,16 @@
 package fileProject.controller;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,11 +79,22 @@ public class FileController {
 	}
 
 	@GetMapping("/download/{fileId}")
-	public ResponseEntity<byte[]> downloadFile(@PathVariable UUID fileId) {
+	public ResponseEntity<Resource> downloadFile(@PathVariable UUID fileId) throws java.io.IOException {
 		try {
-			Optional<byte[]> fileData = fileService.downloadFile(fileId);
-			return fileData.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-		} catch (Exception e) {
+			Optional<Resource> fileOptional = fileService.downloadFile(fileId);
+			if (fileOptional.isPresent()) {
+				Resource resource = fileOptional.get();
+				Path path = resource.getFile().toPath(); // Dosya yolunu doğrudan alıyoruz
+				String contentType = fileService.getContentType(path);
+
+				return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=\"" + path.getFileName().toString() + "\"")
+						.body(resource);
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
+		} catch (IOException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
@@ -89,5 +104,10 @@ public class FileController {
 		List<File> files = fileService.getAllFiles();
 		return files.stream().map(file -> modelMapper.forResponse().map(file, GetAllFileResponse.class))
 				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<Resource> getFile(@PathVariable UUID id) {
+		return fileService.serveFile(id);
 	}
 }

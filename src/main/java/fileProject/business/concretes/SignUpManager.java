@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import fileProject.business.abstracts.SignUpService;
+import fileProject.business.rules.signUp.SignUpBusinessRule;
 import fileProject.dataAccess.UserRepository;
 import fileProject.entities.User;
 
@@ -15,14 +16,17 @@ public class SignUpManager implements SignUpService {
 	private UserRepository userRepository;
 
 	@Autowired
+	private SignUpBusinessRule signUpBusinessRule;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public String signUp(String name, String email, String password) {
 
-		if (userRepository.getUserByEmail(email).equals(email)) {
-			throw new RuntimeException("User with this email already exists");
-		}
+//		if (userRepository.getUserByEmail(email).equals(email)) {
+//			throw new RuntimeException("User with this email already exists");
+//		}
 
 		User newUser = new User();
 		newUser.setName(name);
